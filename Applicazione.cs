@@ -3,7 +3,7 @@ using System;
 class Program
 {   
     //dichiarazione main
-    static void main()
+    static void Main()
     {
         int scelta;
 
@@ -23,6 +23,9 @@ class Program
 
             switch (scelta)
             {
+                case 0:
+                    // Ferma programma
+                    break;
                 case 1:
                     // Inserimento
                     break;
