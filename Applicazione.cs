@@ -1,34 +1,54 @@
 using System;
-using System.IO; //per la lettura del file 
+using System.IO; //per la lettura del file
+using System.Globalization; //per la conversione corretta dei numeri decimali. ESEMPIO: se noi scriviamo 23,400 il programma lo legge come 23400. Con questa libreria, evitiamo questo problema
+
+//classe che rappresenta un singolo record del file CSV
+class NumCivica
+{
+    public string classe;
+    public string descrizione;
+    public string numero;
+    public string subalterno;
+    public string CAP;
+    public string ISTAT;
+    public double lng;
+    public double lat;
+}
 
 class Program
 {
-
-
     //dichiarazione main
     static void Main()
     {
         //dichiarazione variabili
         int scelta;
 
+        //array che conterrà i dati caricati dal file 
+        NumCivica[] dati=new NumCivica[1000];
+        for (int i=0;i<dati.Length;i++)
+        {
+            dati[i]=new NumCivica();
+        }
+
+        //tiene traccia di quante righe sono state effettivamente caricate dal file
+        int righeCaricate = 0;
+
         do
         {
-
-
             //struttura a menù
             Console.WriteLine("1 - Inserimento di un nuovo record\n2 - Visualizzazione dei file\n3 - Modifica di un record\n4 - Cancellazione di un record\n");
             Console.Write("Scegliere una funzione: ");
 
-            //dato che con ReadLine legge solo stringe, con la funzione Covert l'input viene convertito in intero  
+            //dato che con ReadLine legge solo stringe, con la funzione Covert l'input viene convertito in intero
             //COVERT UTILIZZATI: Covert.ToInt32, Convert.ToDouble, Convert.ToString
-            scelta= Convert.ToInt32(Console.ReadLine()); 
-            
+            scelta = Convert.ToInt32(Console.ReadLine());
 
             switch (scelta)
             {
                 case 0:
                     // Ferma programma
                     break;
+
                 case 1:
 
                     //variabili
@@ -56,7 +76,7 @@ class Program
                     //variabile che controlla se l'inserimento è andato a buon fine
                     bool esito=InsertDati(classe, descrizione, numero, subalterno, CAP, ISTAT, lng, lat);
 
-                    if(!esito)
+                    if (!esito)
                     {
                         Console.WriteLine("\nErrore nell'apertura del file.\n");
                     }
@@ -68,7 +88,7 @@ class Program
                     break;
 
                 case 2:
-                    // Visualizzazione
+                    //visualizzazione
                     break;
 
                 case 3:
@@ -85,44 +105,47 @@ class Program
             }
 
         } while (scelta!=0);
-    }   
+    }
 
+    //FUNZIONI
 
-//FUNZIONI
-    
-//INSERTDATI
-//funzione che inserisce un nuovo indirizzo
+    //INSERTDATI
+    //funzione che inserisce un nuovo indirizzo
     static bool InsertDati(string classe, string descrizione, string numero, string subalterno, string CAP, string ISTAT, double lng, double lat)
     {
         //l'idea è quella di creare un nuovo file ogni volta che si inseriscono i dati, per poi farsì che il file originale Comune_Bergamo_-_Numerazione_civica.csv venga eliminato e il file file_copia.csv lo sostituisca
-        
+
         // IF FILE NON ESISTE, RITORNA FALSO, ELSE ESEGUE I COMANDI
-        if(File.Exists("Comune_Bergamo_-_Numerazione_civica.csv")==false)
+        if (File.Exists("Comune_Bergamo_-_Numerazione_civica.csv") == false)
         {
             //se il file non esiste ritorna false
             return false;
-        }else
+        }
+        else
         {
             //apre il file originale in lettura e quello copia in scrittura
-            StreamReader lettura=new StreamReader("Comune_Bergamo_-_Numerazione_civica.csv");
-            StreamWriter scrittura=new StreamWriter("file_copia.csv");
+            StreamReader lettura = new StreamReader("Comune_Bergamo_-_Numerazione_civica.csv");
+            StreamWriter scrittura = new StreamWriter("file_copia.csv");
             {
                 string riga;
 
-                //copia riga per riga il contenuto del file originale nella copia finché non raggiunge non trova null (ovvero fino all'ultima riga)
-                while ((riga=lettura.ReadLine())!=null)
+                //copia riga per riga il contenuto del file originale nella copia finché non trova null (ovvero fino all'ultima riga)
+                while ((riga = lettura.ReadLine()) != null)
                 {
                     scrittura.WriteLine(riga);
                 }
 
                 //aggiunge in fondo la nuova riga con i dati inseriti dall'utente
-                scrittura.WriteLine($"{classe},{descrizione},{numero},{subalterno},{CAP},{ISTAT},{lng},{lat},");
+                scrittura.WriteLine($"{classe},{descrizione},{numero},{subalterno},{CAP},{ISTAT},{lng},{lat}");
 
                 /*L'USO DI $ serve per evitare di scrivere una catena di variabili tutti uniti dal +
                 ESEMPIO: classe+ "," + descrizione etc...
                 Entrambi i modi sono uguali*/
-
             }
+
+            //chiude esplicitamente i file prima di eliminare/rinominare
+            lettura.Close();
+            scrittura.Close();
 
             //elimina il file originale e rinomina la copia con il nome originale
             File.Delete("Comune_Bergamo_-_Numerazione_civica.csv");
@@ -131,5 +154,4 @@ class Program
             return true;
         }
     }
-
 }
