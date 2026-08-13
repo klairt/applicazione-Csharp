@@ -88,15 +88,15 @@ class Program
                     break;
 
                 case 2:
-                    //visualizzazione
+                    //Caricamento + Visualizzazione
                     break;
 
                 case 3:
-                    // Modifica
+                    //Modifica
                     break;
 
                 case 4:
-                    // Cancellazione
+                    //Cancellazione
                     break;
 
                 default:
@@ -153,5 +153,57 @@ class Program
 
             return true;
         }
+    }
+
+    //CARICADATI
+    //funzione che carica i dati dal file CSV nell'array v
+    //righeTot è la dimensione massima dell'array, righeCaricate (out) è quante righe sono state lette davvero per evotare che vengano stampate righe vuote
+    static bool CaricaDati(NumCivica[] v, int righeTot, out int righeCaricate)
+    {
+        righeCaricate = 0;
+
+        //se il file non esiste ritorna false
+        if (!File.Exists("Comune_Bergamo_-_Numerazione_civica.csv"))
+        {
+            return false;
+        }
+
+        StreamReader lettura = new StreamReader("Comune_Bergamo_-_Numerazione_civica.csv");
+
+        //salta la riga di intestazione, come getline(leggi, riga) in C++
+        lettura.ReadLine();
+
+        int i = 0;
+        string riga;
+
+        //legge finché ci sono righe disponibili e non si supera la dimensione dell'array
+        while (i<righeTot && (riga = lettura.ReadLine())!=null)
+        {
+            //se la riga è vuota la saltiamo (es. riga vuota finale nel file)
+            if (riga.Trim() == "")
+            {
+                continue;
+            }
+
+            //divide la riga nei singoli campi separati da virgola nel file csv
+            string[] campi = riga.Split(',');
+
+            v[i].classe=campi[0];
+            v[i].descrizione=campi[1];
+            v[i].numero=campi[2];
+            v[i].subalterno=campi[3];
+            v[i].CAP=campi[4];
+            v[i].ISTAT=campi[5];
+
+            //InvariantCulture assicura che il punto venga sempre letto come separatore decimale e non intero
+            v[i].lng=Convert.ToDouble(campi[6], CultureInfo.InvariantCulture);
+            v[i].lat=Convert.ToDouble(campi[7], CultureInfo.InvariantCulture);
+
+            i++;
+        }
+
+        righeCaricate=i;
+        lettura.Close();
+        return true;
     }
 }
