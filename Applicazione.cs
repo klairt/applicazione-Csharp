@@ -88,15 +88,28 @@ class Program
                     break;
 
                 case 2:
-                    //Caricamento + Visualizzazione
+                    // Caricamento + Visualizzazione
+
+                    /*
+
+                    */
+                    if (CaricaDati(dati, dati.Length, out righeCaricate))
+                    {
+                        Console.WriteLine($"\nDati caricati: {righeCaricate} righe\n");
+                        Console.WriteLine(VisualizzaDati(dati, righeCaricate));
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nErrore nell'apertura del file.\n");
+                    }
                     break;
 
                 case 3:
-                    //Modifica
+                    // Modifica
                     break;
 
                 case 4:
-                    //Cancellazione
+                    // Cancellazione
                     break;
 
                 default:
@@ -205,5 +218,25 @@ class Program
         righeCaricate=i;
         lettura.Close();
         return true;
+    }
+
+    //VISUALIZZADATI
+    //funzione che costruisce la stringa con tutti i dati da mostrare a video
+    static string VisualizzaDati(NumCivica[] v, int righeCaricate)
+    {
+        //STRUTTRA MOLTO SIMILE A C++
+        string s = "";
+        for (int i = 0; i < righeCaricate; i++)
+        {
+            s+=v[i].classe + "\t";
+            s+=v[i].descrizione + "\t";
+            s+=v[i].numero + "\t";
+            s+=v[i].subalterno + "\t";
+            s+=v[i].CAP + "\t";
+            s+=v[i].ISTAT + "\t";
+            s+=v[i].lng + "\t";
+            s+=v[i].lat + "\n";
+        }
+        return s;
     }
 }
