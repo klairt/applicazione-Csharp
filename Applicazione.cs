@@ -106,6 +106,62 @@ class Program
 
                 case 3:
                     // Modifica
+
+                    /*FUNZIONAMENTO
+                    1) Chiedo all'utente la descrizione e il numero civico da cercare
+                    2) Richiamo la funzione Search che mi restituisce la posizione
+                    3) Se la posizione è -1, stampo "Elemento non trovato"
+                    4) Altrimenti chiedo all'utente i nuovi dati da inserire
+                    5) Richiamo la funzione UpdateDati che riscrive il file con i dati modificati
+                    6) Se l'esito è true, stampo "Modifica effettuata con successo", altrimenti stampo "Errore nella modifica"
+                    */
+
+
+                    Console.Write("\nInserire descrizione da cercare: ");
+                    string d=Console.ReadLine();
+                    Console.Write("Inserire il numero civico da modificare: ");
+                    string n=Console.ReadLine();
+                    int posizione=Search(d, n);
+ 
+                    if (posizione==-1)
+                    {
+                        Console.WriteLine("\nElemento non trovato.\n");
+                    }
+                    else
+                    {
+                    
+                        string classe1, descrizione1, numero1, subalterno1, CAP1, ISTAT1;
+                        double lng1, lat1;
+ 
+                        Console.Write("\nInserire nuova classe: ");
+                        classe1 = Console.ReadLine();
+                        Console.Write("Inserire la nuova descrizione: ");
+                        descrizione1 = Console.ReadLine();
+                        Console.Write("Inserire il nuovo numero: ");
+                        numero1 = Console.ReadLine();
+                        Console.Write("Inserire il nuovo subalterno: ");
+                        subalterno1 = Console.ReadLine();
+                        Console.Write("Inserire il nuovo CAP: ");
+                        CAP1 = Console.ReadLine();
+                        Console.Write("Inserire il nuovo ISTAT: ");
+                        ISTAT1 = Console.ReadLine();
+                        Console.Write("Inserire la nuova longitudine: ");
+                        lng1 = Convert.ToDouble(Console.ReadLine());
+                        Console.Write("Inserire la nuova latitudine: ");
+                        lat1 = Convert.ToDouble(Console.ReadLine());
+ 
+                        
+                        bool esito1=UpdateDati(posizione, classe1, descrizione1, numero1, subalterno1, CAP1, ISTAT1, lng1, lat1);
+ 
+                        if (esito1)
+                        {
+                            Console.WriteLine("\nModifica effettuata con successo!\n");
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nErrore nella modifica.\n");
+                        }
+                    }
                     break;
 
                 case 4:
@@ -239,4 +295,92 @@ class Program
         }
         return s;
     }
+
+     //SEARCH
+    //funzione che cerca un record nel file CSV in base alla descrizione e al numero
+    static int Search(string descrizione, string numero)
+    {
+        //se il file non esiste non posso cercare niente
+        if (!File.Exists("Comune_Bergamo_-_Numerazione_civica.csv"))
+        {
+            return -1;
+        }
+ 
+        StreamReader lettura=new StreamReader("Comune_Bergamo_-_Numerazione_civica.csv");
+ 
+        //salto la riga di intestazione
+        lettura.ReadLine();
+ 
+        string line;
+        int i=0;
+ 
+        //leggo tutte le righe fino alla fine del file
+        while ((line=lettura.ReadLine()) != null)
+        {
+            string[] campi = line.Split(',');
+            string desc = campi[1];
+            string num = campi[2];
+ 
+            //controllo che corrispondano a quello che sto cercando
+            if (desc == descrizione && num == numero)
+            {
+                lettura.Close();
+                //restituisco la posizione (0 = prima riga di dati dopo l'intestazione)
+                return i;
+            }
+ 
+            i++;
+        }
+ 
+        lettura.Close();
+        //se non trovo nulla restituisco -1
+        return -1;
+    }
+ 
+    //UpdateDati
+    //funzione che modifica i dati di un record esistente
+    static bool UpdateDati(int posizione, string classe, string descrizione, string numero, string subalterno, string CAP, string ISTAT, double lng, double lat)
+    {
+        if (!File.Exists("Comune_Bergamo_-_Numerazione_civica.csv"))
+        {
+            return false;
+        }
+ 
+        //Molto simile a InsertDati, ma invece di aggiungere una riga in fondo, sostituisce la riga alla posizione specificata
+        StreamReader lettura=new StreamReader("Comune_Bergamo_-_Numerazione_civica.csv");
+        StreamWriter scrittura=new StreamWriter("file_copia.csv");
+ 
+    
+        string line = lettura.ReadLine();
+        scrittura.WriteLine(line);
+ 
+        int i=0;
+ 
+        //leggo tutte le righe fino alla fine del file
+        while ((line=lettura.ReadLine())!=null)
+        {
+            if (i == posizione)
+            {
+                //quando trovo la riga da modificare, scrivo quella nuova al suo posto
+                scrittura.WriteLine($"{classe},{descrizione},{numero},{subalterno},{CAP},{ISTAT},{lng},{lat}");
+            }
+            else
+            {
+                
+                scrittura.WriteLine(line);
+            }
+ 
+            i++;
+        }
+ 
+        lettura.Close();
+        scrittura.Close();
+ 
+        //elimino il file originale e rinomino la copia con il nome originale
+        File.Delete("Comune_Bergamo_-_Numerazione_civica.csv");
+        File.Move("file_copia.csv", "Comune_Bergamo_-_Numerazione_civica.csv");
+ 
+        return true;
+    }
+ 
 }
