@@ -164,8 +164,40 @@ class Program
                     }
                     break;
 
-                case 4:
+                   case 4:
                     // Cancellazione
+ 
+                    /*FUNZIONAMENTO
+                    1) Chiedo all'utente la descrizione e il numero civico da cercare
+                    2) Richiamo la funzione Search che mi restituisce la posizione
+                    3) Se la posizione è -1, stampo "Elemento non trovato"
+                    4) Altrimenti richiamo DeleteDati che riscrive il file senza quella riga
+                    5) Se l'esito è true, stampo "Cancellazione avvenuta", altrimenti stampo "Errore nella cancellazione"
+                    */
+ 
+                    Console.Write("\nInserire descrizione da cercare: ");
+                    string d2=Console.ReadLine();
+                    Console.Write("Inserire il numero civico da cancellare: ");
+                    string n2=Console.ReadLine();
+                    int posizione2=Search(d2, n2);
+ 
+                    if (posizione2==-1)
+                    {
+                        Console.WriteLine("\nElemento non trovato.\n");
+                    }
+                    else
+                    {
+                        bool esito2=DeleteDati(posizione2);
+ 
+                        if (esito2)
+                        {
+                            Console.WriteLine("\nCancellazione avvenuta con successo!\n");
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nErrore nella cancellazione.\n");
+                        }
+                    }
                     break;
 
                 default:
@@ -367,6 +399,48 @@ class Program
             else
             {
                 
+                scrittura.WriteLine(line);
+            }
+ 
+            i++;
+        }
+ 
+        lettura.Close();
+        scrittura.Close();
+ 
+        //elimino il file originale e rinomino la copia con il nome originale
+        File.Delete("Comune_Bergamo_-_Numerazione_civica.csv");
+        File.Move("file_copia.csv", "Comune_Bergamo_-_Numerazione_civica.csv");
+ 
+        return true;
+    }
+
+
+    //DeleteDati
+    //funzione che elimina il record alla posizione indicata
+    static bool DeleteDati(int posizione)
+    {
+        if (!File.Exists("Comune_Bergamo_-_Numerazione_civica.csv"))
+        {
+            return false;
+        }
+ 
+        //Molto simile a UpdateDati, ma invece di sostituire la riga trovata, la salto (non la riscrivo)
+        StreamReader lettura=new StreamReader("Comune_Bergamo_-_Numerazione_civica.csv");
+        StreamWriter scrittura=new StreamWriter("file_copia.csv");
+ 
+        //salto/riscrivo l'intestazione
+        string line = lettura.ReadLine();
+        scrittura.WriteLine(line);
+ 
+        int i=0;
+ 
+        //leggo tutte le righe fino alla fine del file
+        while ((line=lettura.ReadLine())!=null)
+        {
+            //finché non trovo la riga da eliminare la copio, quella da eliminare la salto e basta
+            if (i!=posizione)
+            {
                 scrittura.WriteLine(line);
             }
  
